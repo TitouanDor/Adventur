@@ -1,6 +1,8 @@
 #ifndef CONSTANT_GLOBAL_H
 #define CONSTANT_GLOBAL_H
 
-#define SPEED 1
+#define SPEED 3
+#define WINDOW_HEIGHT 1080
+#define WINDOW_WIDTH 1920
 
 #endif
