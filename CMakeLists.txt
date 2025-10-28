@@ -7,6 +7,7 @@ find_package(SDL3 REQUIRED)
 add_executable(
     Adventur 
     main.c
+    Player.c
     )
 
 target_link_libraries(Adventur PRIVATE SDL3::SDL3)

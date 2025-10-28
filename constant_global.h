@@ -1,0 +1,10 @@
+#ifndef CONSTANT_GLOBAL_H
+#define CONSTANT_GLOBAL_H
+
+#define SPEED 3
+#define FPS 60
+#define FRAME_DELAY 1000/60
+#define WINDOW_HEIGHT 1080
+#define WINDOW_WIDTH 1920
+
+#endif
