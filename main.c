@@ -4,12 +4,13 @@
 #include <SDL3/SDL_main.h>
 #include "Player.h"
 #include "constant_global.h"
-#include "Element.h"
 
 
 
 /* We will use this renderer to draw into this window every frame. */
 static Player* p = NULL;
+int frameTime;
+Uint32 frameSart;
 
 typedef struct{
     SDL_Window *window;
@@ -57,7 +58,8 @@ SDL_AppResult SDL_AppEvent(void* appstate, SDL_Event* event)
 SDL_AppResult SDL_AppIterate(void* appstate)
 {
     Gamectx* gameState = (Gamectx *)appstate;
-    const double now = ((double)SDL_GetTicks()) / 1000.0;  /*convert from milliseconds to seconds. */
+    frameSart = SDL_GetTicks();
+    
     const bool* state = SDL_GetKeyboardState(NULL);
     p = MovePlayer(p, state);
 
@@ -72,6 +74,11 @@ SDL_AppResult SDL_AppIterate(void* appstate)
 
     /* put the newly-cleared rendering on the screen. */
     SDL_RenderPresent(gameState->renderer);
+
+    frameTime = SDL_GetTicks() - frameSart;
+    if(FRAME_DELAY > frameTime){
+        SDL_Delay(FRAME_DELAY - frameTime);
+    }
 
     return SDL_APP_CONTINUE;  /* carry on with the program! */
 }
