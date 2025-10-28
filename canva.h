@@ -8,6 +8,11 @@ typedef struct{
     SDL_FRect* Walls;
 }Canva;
 
+typedef struct cache{
+    Canva* canva;
+    struct cache* next;
+}Cache;
+
 Canva* Get_Canva(int id);
 
 #endif
