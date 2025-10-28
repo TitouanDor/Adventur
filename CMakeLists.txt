@@ -8,6 +8,7 @@ add_executable(
     Adventur 
     main.c
     Player.c
+    canva.c
     )
 
 target_link_libraries(Adventur PRIVATE SDL3::SDL3)

@@ -4,6 +4,7 @@
 #include <SDL3/SDL_main.h>
 #include "Player.h"
 #include "constant_global.h"
+#include "canva.h"
 
 
 
