@@ -1,2 +1,91 @@
 #include <SDL3/SDL.h>
+#include <stdlib.h>
+#include <stdio.h>
+#include <json-c/json.h>
 #include "canva.h"
+
+Canva* Get_Canva(int id_canva){
+    /*take the json file*/
+    FILE *f = fopen("./../canva.json", "r");
+    if (!f) {
+        printf("Erreur d'ouverture du fichier\n");
+        return NULL;
+    }
+
+    fseek(f, 0, SEEK_END);
+    long size = ftell(f);
+    rewind(f);
+    char *buffer = malloc(size + 1);
+    fread(buffer, 1, size, f);
+    buffer[size] = '\0';
+    fclose(f);
+    
+    Canva* canva = (Canva*)malloc(sizeof(Canva));
+    SDL_FRect* L_walls;
+    struct json_object *root = json_tokener_parse(buffer);
+    free(buffer);
+
+    if (json_object_is_type(root, json_type_array)) {
+        int n = json_object_array_length(root);
+        for (int i = 0; i < n; i++) {
+
+            struct json_object *obj = json_object_array_get_idx(root, i);
+            struct json_object *id, *walls;
+
+            /*Search for id*/
+            if (json_object_object_get_ex(obj, "id", &id)){
+                canva->id = json_object_get_int(id);
+            }
+            else{
+                return NULL;
+            }
+
+            if(canva->id == id_canva){
+
+                L_walls = (SDL_FRect*)malloc(canva->nb_wall*sizeof(SDL_FRect));
+
+                /*search for the list of Walls*/
+                if(json_object_object_get_ex(obj, "Walls", &walls) && json_object_is_type(walls, json_type_array)){
+
+                    int len = json_object_array_length(walls);
+                    canva->nb_wall = len;
+                    int temp[4];
+
+                    for(int k=0;k<len;k++){
+
+                        struct json_object* wall = json_object_array_get_idx(walls, k);
+
+                        if(json_object_is_type(wall, json_type_array)){
+
+                            /*Search for x,y,w and h of the wall*/
+                            int len_sub = json_object_array_length(wall);
+                            for(int j = 0; j < len_sub; j++){
+                                struct json_object* W = json_object_array_get_idx(wall, j);
+                                temp[j] = json_object_get_int(W);
+                            }
+                        }
+                        else{
+                            return NULL;
+                        }
+
+                        L_walls[k].x = temp[0];
+                        L_walls[k].y = temp[1];
+                        L_walls[k].w = temp[2];
+                        L_walls[k].h = temp[3];
+                        }
+                }
+                else{
+                    return NULL;
+                }
+                
+                canva->Walls = L_walls;
+                printf("Canva n°%d import\n", canva->id);
+                return canva;
+            }
+        }
+    }
+
+    json_object_put(root);
+    printf("ERROR Get_Canva : Canva not found\n");
+    return NULL;
+}

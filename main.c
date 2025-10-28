@@ -10,8 +10,7 @@
 
 /* We will use this renderer to draw into this window every frame. */
 static Player* p = NULL;
-int frameTime;
-Uint32 frameSart;
+
 
 typedef struct{
     SDL_Window *window;
@@ -32,6 +31,7 @@ SDL_AppResult SDL_AppInit(void** appstate, int argc, char* argv[])
         return SDL_APP_FAILURE;
     }
     *appstate = gameState;
+    gameState->canva = 0;
 
     if (!SDL_CreateWindowAndRenderer("Adventur", WINDOW_WIDTH, WINDOW_HEIGHT, SDL_WINDOW_RESIZABLE, &gameState->window, &gameState->renderer)) {
         SDL_Log("Couldn't create window/renderer: %s", SDL_GetError());
@@ -59,7 +59,7 @@ SDL_AppResult SDL_AppEvent(void* appstate, SDL_Event* event)
 SDL_AppResult SDL_AppIterate(void* appstate)
 {
     Gamectx* gameState = (Gamectx *)appstate;
-    frameSart = SDL_GetTicks();
+    Uint32 frameSart = SDL_GetTicks();
     
     const bool* state = SDL_GetKeyboardState(NULL);
     p = MovePlayer(p, state);
@@ -73,10 +73,16 @@ SDL_AppResult SDL_AppIterate(void* appstate)
     SDL_RenderRect(gameState->renderer, &p->skin);
     SDL_RenderFillRect(gameState->renderer, &p->skin);
 
+    /*Render canva */
+    Canva* canva = Get_Canva(gameState->canva);
+    if(canva == NULL){
+        return SDL_APP_FAILURE;
+    }
+
     /* put the newly-cleared rendering on the screen. */
     SDL_RenderPresent(gameState->renderer);
 
-    frameTime = SDL_GetTicks() - frameSart;
+    int frameTime = SDL_GetTicks() - frameSart;
     if(FRAME_DELAY > frameTime){
         SDL_Delay(FRAME_DELAY - frameTime);
     }
