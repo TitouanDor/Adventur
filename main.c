@@ -43,6 +43,9 @@ SDL_AppResult SDL_AppInit(void **gamestate, int argc, char *argv[])
     gameState->id_canva = 0;
     gameState->nb_canva = 1;
     gameState->cache->canva = Get_Canva(0);
+    if(gameState->cache->canva == NULL){
+        return SDL_APP_FAILURE;
+    }
     gameState->cache->next = NULL;
 
 
@@ -67,6 +70,9 @@ SDL_AppResult SDL_AppEvent(void *gamestate, SDL_Event *event)
         if(event->key.key == SDLK_R){ /*Reload the cache*/
             printf("reload\n");
             gameState->cache->canva = Get_Canva(gameState->id_canva);
+            if(gameState->cache->canva == NULL){
+                return SDL_APP_FAILURE;
+            }
             gameState->cache->next = NULL;
             gameState->nb_canva = 1;
         }
@@ -99,6 +105,9 @@ SDL_AppResult SDL_AppIterate(void *gamestate)
     }
     else{ /*Else load it and insert it into the cache*/
         Canva* temp_canva = Get_Canva(gameState->id_canva);
+        if(gameState->cache->canva == NULL){
+            return SDL_APP_FAILURE;
+        }
         Cache* temp = (Cache*)SDL_calloc(1, sizeof(Cache));
         Cache *l_cache = gameState->cache;
         if (!temp) {
