@@ -90,6 +90,17 @@ SDL_AppResult SDL_AppEvent(void *gamestate, SDL_Event *event)
             gameState->cache->next = NULL;
             gameState->nb_canva = 1;
         }
+        if(event->key.key == SDLK_P){ /*Reset du jeu*/
+            WriteLog("Reset Game");
+            gameState->id_canva = 0;
+            gameState->cache->canva = Get_Canva(gameState->id_canva);
+            if(gameState->cache->canva == NULL){
+                WriteLog("Initialisation gameState->cache->canva : ERROR");
+                return SDL_APP_FAILURE;
+            }
+            gameState->cache->next = NULL;
+            gameState->nb_canva = 1;
+        }
     }
 
     return SDL_APP_CONTINUE;  /* carry on with the program! */
