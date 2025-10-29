@@ -53,12 +53,12 @@ Player* MovePlayer(Player *p, const bool *state){
     return p;
 }
 
-Player* Get_renderSkin(Player *P){
+Player* Get_renderSkin(Player *p){
     Player *render_p = (Player*)malloc(sizeof(Player));
-    render_p->skin.x = P->skin.x*window_width;
-    render_p->skin.y = P->skin.y*window_height;
-    render_p->skin.w = P->skin.w*window_width;
-    render_p->skin.h = P->skin.h*window_height;
+    render_p->skin.x = p->skin.x*window_width;
+    render_p->skin.y = p->skin.y*window_height;
+    render_p->skin.w = p->skin.w*window_width;
+    render_p->skin.h = p->skin.h*window_height;
     return render_p;
 }
 
