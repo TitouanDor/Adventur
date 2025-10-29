@@ -74,15 +74,16 @@ SDL_AppResult SDL_AppIterate(void *gamestate)
     SDL_GetWindowSize(gameState->window, &window_width, &window_height);
 
     const bool *state = SDL_GetKeyboardState(NULL);
+    Canva *canva = Get_Canva_from_Cache(gameState->id_canva, gameState);
     p = MovePlayer(p, state);
-    p = Change_Canva(p, Get_Canva_from_Cache(gameState->id_canva, gameState), &gameState);
-
+    p = Change_Canva(p, canva, &gameState);
+    p = Collision(p, canva);
     SDL_SetRenderDrawColor(gameState->renderer, 155, 155, 155, SDL_ALPHA_OPAQUE); /*Grey, full alpha*/
     SDL_RenderClear(gameState->renderer); /* clear the window to the draw color. */
 
     /*Render canva*/
     /*Search if canva is already load*/
-    Canva *canva = Get_Canva_from_Cache(gameState->id_canva, gameState);
+    canva = Get_Canva_from_Cache(gameState->id_canva, gameState);
     if(canva != NULL){/*If already loaded*/
         canva = Get_render_Canva(canva);
     }

@@ -32,9 +32,8 @@ Player* MovePlayer(Player *p, const bool *state){
     if(state[SDL_SCANCODE_UP]){
         dy -= SPEED/100.f;
     }
-
-    p->skin.x = p->skin.x+dx;
-    p->skin.y = p->skin.y+dy;
+    p->skin.x += dx;
+    p->skin.y += dy;
 
     return p;
 }
@@ -89,6 +88,32 @@ Player* Change_Canva(Player *p, Canva* canva, Gamectx **ctx){
         }
     }
 
+    return p;
+}
+
+Player* Collision(Player *p, Canva* canva){
+    for(int i=0;i<canva->nb_wall;i++){
+        SDL_FRect wall = canva->Walls[i];
+        SDL_FRect inter;
+        if(SDL_GetRectIntersectionFloat(&p->skin, &wall, &inter)){
+            if(inter.w < inter.h){
+                if(p->skin.x < wall.x){
+                    p->skin.x -= inter.w;
+                }
+                else{
+                    p->skin.x += inter.w;
+                }
+            }
+            else{
+                if(p->skin.y < wall.y){
+                    p->skin.y -= inter.h;
+                }
+                else{
+                    p->skin.y += inter.h;
+                }
+            }
+        }
+    }
     return p;
 }
 
