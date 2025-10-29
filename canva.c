@@ -4,6 +4,8 @@
 #include <json-c/json.h>
 #include "canva.h"
 
+extern int window_width, window_height;
+
 Canva* Get_Canva(int id_canva){
     /*take the json file*/
     FILE *f = fopen("./../canva.json", "r");
@@ -20,8 +22,8 @@ Canva* Get_Canva(int id_canva){
     buffer[size] = '\0';
     fclose(f);
     
-    Canva* canva = (Canva*)malloc(sizeof(Canva));
-    SDL_FRect* L_walls;
+    Canva *canva = (Canva*)malloc(sizeof(Canva));
+    SDL_FRect *L_walls;
     struct json_object *root = json_tokener_parse(buffer);
     free(buffer);
 
@@ -49,19 +51,21 @@ Canva* Get_Canva(int id_canva){
 
                     int len = json_object_array_length(walls);
                     canva->nb_wall = len;
-                    int temp[4];
+                    float temp[4];
 
                     for(int k=0;k<len;k++){
 
-                        struct json_object* wall = json_object_array_get_idx(walls, k);
+                        struct json_object *wall = json_object_array_get_idx(walls, k);
 
                         if(json_object_is_type(wall, json_type_array)){
 
                             /*Search for x,y,w and h of the wall*/
                             int len_sub = json_object_array_length(wall);
                             for(int j = 0; j < len_sub; j++){
-                                struct json_object* W = json_object_array_get_idx(wall, j);
+                                struct json_object *W = json_object_array_get_idx(wall, j);
                                 temp[j] = json_object_get_int(W);
+                                temp[j] /= 100;
+                                
                             }
                         }
                         else{
@@ -72,7 +76,7 @@ Canva* Get_Canva(int id_canva){
                         L_walls[k].y = temp[1];
                         L_walls[k].w = temp[2];
                         L_walls[k].h = temp[3];
-                        }
+                    }
                 }
                 else{
                     return NULL;
@@ -88,4 +92,19 @@ Canva* Get_Canva(int id_canva){
     json_object_put(root);
     printf("ERROR Get_Canva : Canva not found\n");
     return NULL;
+}
+
+Canva* Get_render_Canva(Canva *canva){
+    Canva *render_canva = (Canva*)malloc(sizeof(Canva));
+    render_canva->id = canva->id;
+    render_canva->nb_wall = canva->nb_wall;
+    render_canva->Walls = (SDL_FRect*)malloc(canva->nb_wall*sizeof(SDL_FRect));
+    for(int i = 0; i < canva->nb_wall; i++){
+        render_canva->Walls[i].x = canva->Walls[i].x*window_width;
+        render_canva->Walls[i].y = canva->Walls[i].y*window_height;
+        render_canva->Walls[i].w = canva->Walls[i].w*window_width;
+        render_canva->Walls[i].h = canva->Walls[i].h*window_height;
+    }
+
+    return render_canva;
 }

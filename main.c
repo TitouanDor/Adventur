@@ -7,7 +7,10 @@
 #include "constant_global.h"
 #include "canva.h"
 
-static Player* p = NULL;
+static Player *p = NULL;
+int window_width = 1280, window_height = 720;
+int temp_window_width, temp_window_height;
+float window_ratio;
 
 typedef struct{
     SDL_Window *window;
@@ -18,14 +21,14 @@ typedef struct{
 }Gamectx;
 
 /* This function runs once at startup. */
-SDL_AppResult SDL_AppInit(void** gamestate, int argc, char* argv[])
+SDL_AppResult SDL_AppInit(void **gamestate, int argc, char *argv[])
 {
     if (!SDL_Init(SDL_INIT_VIDEO)) {
         SDL_Log("Couldn't initialize SDL: %s", SDL_GetError());
         return SDL_APP_FAILURE;
     }
 
-    Gamectx* gameState = (Gamectx*)SDL_calloc(1, sizeof(Gamectx));
+    Gamectx *gameState = (Gamectx*)SDL_calloc(1, sizeof(Gamectx));
     if (!gameState) {
         return SDL_APP_FAILURE;
     }
@@ -40,7 +43,7 @@ SDL_AppResult SDL_AppInit(void** gamestate, int argc, char* argv[])
     gameState->cache->next = NULL;
 
 
-    if (!SDL_CreateWindowAndRenderer("Adventur", WINDOW_WIDTH, WINDOW_HEIGHT, SDL_WINDOW_RESIZABLE, &gameState->window, &gameState->renderer)) {
+    if (!SDL_CreateWindowAndRenderer("Adventur", window_width, window_height, SDL_WINDOW_RESIZABLE, &gameState->window, &gameState->renderer)) {
         SDL_Log("Couldn't create window/renderer: %s", SDL_GetError());
         return SDL_APP_FAILURE;
     }
@@ -50,7 +53,7 @@ SDL_AppResult SDL_AppInit(void** gamestate, int argc, char* argv[])
 }
 
 /* This function runs when a new event (mouse input, keypresses, etc) occurs. */
-SDL_AppResult SDL_AppEvent(void* gamestate, SDL_Event* event)
+SDL_AppResult SDL_AppEvent(void *gamestate, SDL_Event *event)
 {
     if(event->type == SDL_EVENT_QUIT){
         return SDL_APP_SUCCESS;  /* end the program, reporting success to the OS. */
@@ -60,12 +63,14 @@ SDL_AppResult SDL_AppEvent(void* gamestate, SDL_Event* event)
 }
 
 /* This function runs once per frame, and is the heart of the program. */
-SDL_AppResult SDL_AppIterate(void* gamestate)
+SDL_AppResult SDL_AppIterate(void *gamestate)
 {
-    Gamectx* gameState = (Gamectx *)gamestate;
+    Gamectx *gameState = (Gamectx *)gamestate;
     Uint32 frameSart = SDL_GetTicks();
-    
-    const bool* state = SDL_GetKeyboardState(NULL);
+
+    SDL_GetWindowSize(gameState->window, &window_width, &window_height);
+
+    const bool *state = SDL_GetKeyboardState(NULL);
     p = MovePlayer(p, state);
 
     SDL_SetRenderDrawColor(gameState->renderer, 155, 155, 155, SDL_ALPHA_OPAQUE); /*Grey, full alpha*/
@@ -74,9 +79,9 @@ SDL_AppResult SDL_AppIterate(void* gamestate)
 
     /*Render canva*/
     /*Search if canva is already load*/
-    Canva* canva;
+    Canva *temp_canva, *canva;
     int loaded = 0, i = 0;
-    Cache* temp = gameState->cache;
+    Cache *temp = gameState->cache;
     while(loaded == 0 && temp->next==NULL){
         if(temp->canva->id == gameState->id_canva){
             loaded = 1;
@@ -87,28 +92,30 @@ SDL_AppResult SDL_AppIterate(void* gamestate)
     }
 
     if(loaded==1 && temp != NULL){/*If already loaded*/
-        canva = temp->canva;
+        canva = Get_render_Canva(temp->canva);
     }
     else{ /*Else load it and insert it into the cache*/
-        canva = Get_Canva(gameState->id_canva);
+        temp_canva = Get_Canva(gameState->id_canva);
         temp = (Cache*)SDL_calloc(1, sizeof(Cache));
         if (!temp) {
             return SDL_APP_FAILURE;
         }
         temp->next = NULL;
-        temp->canva = canva;
+        temp->canva = temp_canva;
         gameState->nb_canva++;
         gameState->cache->next = temp;
+        canva = Get_render_Canva(temp->canva);
     }
 
-    SDL_SetRenderDrawColor(gameState->renderer, 255, 255, 0, SDL_ALPHA_OPAQUE);  /* red, full alpha */
+    SDL_SetRenderDrawColor(gameState->renderer, 100, 100, 100, SDL_ALPHA_OPAQUE);  /* Dark Grey, full alpha */
     SDL_RenderRects(gameState->renderer, canva->Walls, canva->nb_wall);
     SDL_RenderFillRects(gameState->renderer,canva->Walls, canva->nb_wall);
 
     /*Render player*/
+    Player *render_player = Get_renderSkin(p);
     SDL_SetRenderDrawColor(gameState->renderer, 255, 0, 0, SDL_ALPHA_OPAQUE);  /* red, full alpha */
-    SDL_RenderRect(gameState->renderer, &p->skin);
-    SDL_RenderFillRect(gameState->renderer, &p->skin);
+    SDL_RenderRect(gameState->renderer, &render_player->skin);
+    SDL_RenderFillRect(gameState->renderer, &render_player->skin);
 
     /* put the newly-cleared rendering on the screen. */
     SDL_RenderPresent(gameState->renderer);
@@ -122,10 +129,10 @@ SDL_AppResult SDL_AppIterate(void* gamestate)
 }
 
 /* This function runs once at shutdown. */
-void SDL_AppQuit(void* gamestate, SDL_AppResult result)
+void SDL_AppQuit(void *gamestate, SDL_AppResult result)
 {
     if (gamestate != NULL) {
-        Gamectx* as = (Gamectx*)gamestate;
+        Gamectx *as = (Gamectx*)gamestate;
         SDL_DestroyRenderer(as->renderer);
         SDL_DestroyWindow(as->window);
         SDL_free(as);

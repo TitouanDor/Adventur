@@ -7,6 +7,8 @@ typedef struct{
 }Player;
 
 Player* InitPlayer(void);
-Player* MovePlayer(Player* p, const bool* state);
+Player* MovePlayer(Player *p, const bool *state);
+Player* Get_renderSkin(Player *P);
+void print_player(Player *p);
 
 #endif
