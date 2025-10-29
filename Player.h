@@ -4,8 +4,16 @@
 #include "canva.h"
 #include "constant_global.h"
 
+enum player_state{
+    SNEAK,
+    RUNNING,
+    STOP,
+};
+
 typedef struct{
     SDL_FRect skin;
+    enum player_state state;
+
 }Player;
 
 Player* InitPlayer(void);
