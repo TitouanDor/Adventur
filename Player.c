@@ -4,6 +4,7 @@
 #include <stdio.h>
 #include "constant_global.h"
 #include "canva.h"
+#include "Log.h"
 
 extern int window_width, window_height;
 
@@ -72,6 +73,9 @@ Player* Change_Canva(Player *p, Canva* canva, Gamectx **ctx){
         if(canva->id_next_canva[0] != -1){
             p->skin.x = 0.97;
             gameState->id_canva = canva->id_next_canva[0];
+            char texte[100];
+            sprintf(texte, "Change canva to %d", gameState->id_canva);
+            WriteLog(texte);
         }
         else{
             p->skin.x = 0;
@@ -81,6 +85,9 @@ Player* Change_Canva(Player *p, Canva* canva, Gamectx **ctx){
         if(canva->id_next_canva[1] != -1){
             p->skin.x = 0.01;
             gameState->id_canva = canva->id_next_canva[1];
+            char texte[100];
+            sprintf(texte, "Change canva to %d", gameState->id_canva);
+            WriteLog(texte);
         }
         else{
             p->skin.x = 1 - p->skin.w;
@@ -90,6 +97,9 @@ Player* Change_Canva(Player *p, Canva* canva, Gamectx **ctx){
         if(canva->id_next_canva[2] != -1){
             p->skin.y = 0.97;
             gameState->id_canva = canva->id_next_canva[2];
+            char texte[100];
+            sprintf(texte, "Change canva to %d", gameState->id_canva);
+            WriteLog(texte);
         }
         else{
             p->skin.y = 0;
@@ -101,6 +111,9 @@ Player* Change_Canva(Player *p, Canva* canva, Gamectx **ctx){
         if(canva->id_next_canva[3] != -1){
             p->skin.y = 0.1;
             gameState->id_canva = canva->id_next_canva[3];
+            char texte[100];
+            sprintf(texte, "Change canva to %d", gameState->id_canva);
+            WriteLog(texte);
         }
         else{
             p->skin.y = 1 - p->skin.h;
