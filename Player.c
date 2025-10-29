@@ -93,7 +93,7 @@ Player* Change_Canva(Player *p, Canva* canva, Gamectx **ctx){
             p->skin.x = 1 - p->skin.w;
         }
     }
-    else if (p->skin.y <= 0){
+    if (p->skin.y <= 0){
         if(canva->id_next_canva[2] != -1){
             p->skin.y = 0.97;
             gameState->id_canva = canva->id_next_canva[2];
