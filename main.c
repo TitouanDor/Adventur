@@ -12,6 +12,7 @@ static Player *p = NULL;
 int window_width = WINDOW_WIDTH_START, window_height = WINDOW_HEIGHT_START;
 int temp_window_width, temp_window_height;
 float window_ratio;
+int debug = 1;
 
 Canva* Get_Canva_from_Cache(int id_canva, Gamectx *gameState){
     Cache *temp = gameState->cache;
@@ -25,8 +26,7 @@ Canva* Get_Canva_from_Cache(int id_canva, Gamectx *gameState){
 }
 
 /* This function runs once at startup. */
-SDL_AppResult SDL_AppInit(void **gamestate, int argc, char *argv[])
-{
+SDL_AppResult SDL_AppInit(void **gamestate, int argc, char *argv[]){
     if (!SDL_Init(SDL_INIT_VIDEO)) {
         WriteLog("Initialisation SDL_VIDEO : ERROR");
         return SDL_APP_FAILURE;
@@ -72,8 +72,7 @@ SDL_AppResult SDL_AppInit(void **gamestate, int argc, char *argv[])
 }
 
 /* This function runs when a new event (mouse input, keypresses, etc) occurs. */
-SDL_AppResult SDL_AppEvent(void *gamestate, SDL_Event *event)
-{
+SDL_AppResult SDL_AppEvent(void *gamestate, SDL_Event *event){
     Gamectx *gameState = (Gamectx *)gamestate;
     if(event->type == SDL_EVENT_QUIT){
         return SDL_APP_SUCCESS;  /* end the program, reporting success to the OS. */
@@ -107,8 +106,7 @@ SDL_AppResult SDL_AppEvent(void *gamestate, SDL_Event *event)
 }
 
 /* This function runs once per frame, and is the heart of the program. */
-SDL_AppResult SDL_AppIterate(void *gamestate)
-{
+SDL_AppResult SDL_AppIterate(void *gamestate){
     Gamectx *gameState = (Gamectx *)gamestate;
     Uint32 frameSart = SDL_GetTicks();
 
@@ -160,6 +158,15 @@ SDL_AppResult SDL_AppIterate(void *gamestate)
     SDL_RenderRect(gameState->renderer, &render_player->skin);
     SDL_RenderFillRect(gameState->renderer, &render_player->skin);
 
+
+    if(debug == 1){
+        char debug_text [200];
+        sprintf(debug_text, "Debug|Canva_id : %d|Player State : %d", gameState->id_canva, p->state);
+        SDL_SetRenderDrawColor(gameState->renderer, 255, 255, 255, SDL_ALPHA_OPAQUE);
+        SDL_RenderDebugText(gameState->renderer,0,0,debug_text);
+    }
+    
+
     /* put the newly-cleared rendering on the screen. */
     SDL_RenderPresent(gameState->renderer);
 
@@ -172,8 +179,7 @@ SDL_AppResult SDL_AppIterate(void *gamestate)
 }
 
 /* This function runs once at shutdown. */
-void SDL_AppQuit(void *gamestate, SDL_AppResult result)
-{
+void SDL_AppQuit(void *gamestate, SDL_AppResult result){
     if (gamestate != NULL) {
         Gamectx *as = (Gamectx*)gamestate;
         SDL_DestroyRenderer(as->renderer);

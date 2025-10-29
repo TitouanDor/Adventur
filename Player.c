@@ -21,8 +21,8 @@ Player* InitPlayer(void){
 }
 
 Player* MovePlayer(Player *p, const bool *state){
-    float dx = 0;
-    float dy = 0;
+    float dx = 0.00;
+    float dy = 0.00;
 
     if(state[SDL_SCANCODE_RIGHT]){
         dx += SPEED/100.f;
@@ -37,14 +37,15 @@ Player* MovePlayer(Player *p, const bool *state){
         dy -= SPEED/100.f;
     }
 
-    if(state[SDL_SCANCODE_LSHIFT]){
+    
+    if(SDL_abs(dy*10000) == 0 && SDL_abs(dx*10000) == 0){
+        p->state = STOP;
+    }
+    else if(state[SDL_SCANCODE_LSHIFT]){
         p->state = SNEAK;
         dx /= COEF_SNEAK;
         dy /= COEF_SNEAK;
 
-    }
-    else if(dy == 0 && dx == 0){
-        p->state = STOP;
     }
     else{
         p->state = RUNNING;
