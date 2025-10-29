@@ -6,6 +6,7 @@
 #include "Player.h"
 #include "constant_global.h"
 #include "canva.h"
+#include "Log.h"
 
 static Player *p = NULL;
 int window_width = WINDOW_WIDTH_START, window_height = WINDOW_HEIGHT_START;
