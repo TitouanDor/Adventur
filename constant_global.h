@@ -1,10 +1,19 @@
 #ifndef CONSTANT_GLOBAL_H
 #define CONSTANT_GLOBAL_H
 
-#define SPEED 3
+#define SPEED 0.5
 #define FPS 60
 #define FRAME_DELAY 1000/60
-#define WINDOW_HEIGHT 1080
-#define WINDOW_WIDTH 1920
+#define WINDOW_WIDTH_START 1280
+#define WINDOW_HEIGHT_START 720
+
+typedef struct{
+    SDL_Window *window;
+    SDL_Renderer *renderer;
+    int id_canva;
+    int nb_canva;
+    Cache* cache;
+}Gamectx;
+
 
 #endif
