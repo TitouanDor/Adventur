@@ -58,8 +58,18 @@ SDL_AppResult SDL_AppInit(void **gamestate, int argc, char *argv[])
 /* This function runs when a new event (mouse input, keypresses, etc) occurs. */
 SDL_AppResult SDL_AppEvent(void *gamestate, SDL_Event *event)
 {
+    Gamectx *gameState = (Gamectx *)gamestate;
     if(event->type == SDL_EVENT_QUIT){
         return SDL_APP_SUCCESS;  /* end the program, reporting success to the OS. */
+    }
+
+    if(event->type == SDL_EVENT_KEY_DOWN){
+        if(event->key.key == SDLK_R){ /*Reload the cache*/
+            printf("reload\n");
+            gameState->cache->canva = Get_Canva(gameState->id_canva);
+            gameState->cache->next = NULL;
+            gameState->nb_canva = 1;
+        }
     }
 
     return SDL_APP_CONTINUE;  /* carry on with the program! */
