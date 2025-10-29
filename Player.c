@@ -13,6 +13,7 @@ Player* InitPlayer(void){
     new_p->skin.w = 20.f/(float)window_width;
     new_p->skin.x = 0.5;
     new_p->skin.y = 0.5;
+    new_p->state = STOP;
     return new_p;
 }
 
@@ -32,18 +33,32 @@ Player* MovePlayer(Player *p, const bool *state){
     if(state[SDL_SCANCODE_UP]){
         dy -= SPEED/100.f;
     }
+
+    if(state[SDL_SCANCODE_LSHIFT]){
+        p->state = SNEAK;
+        dx /= COEF_SNEAK;
+        dy /= COEF_SNEAK;
+
+    }
+    else if(dy == 0 && dx == 0){
+        p->state = STOP;
+    }
+    else{
+        p->state = RUNNING;
+    }
+
     p->skin.x += dx;
-    p->skin.y += dy;
+    p->skin.y += dy*((float)window_width/(float)window_height);
 
     return p;
 }
 
-Player* Get_renderSkin(Player *P){
+Player* Get_renderSkin(Player *p){
     Player *render_p = (Player*)malloc(sizeof(Player));
-    render_p->skin.x = P->skin.x*window_width;
-    render_p->skin.y = P->skin.y*window_height;
-    render_p->skin.w = P->skin.w*window_width;
-    render_p->skin.h = P->skin.h*window_height;
+    render_p->skin.x = p->skin.x*window_width;
+    render_p->skin.y = p->skin.y*window_height;
+    render_p->skin.w = p->skin.w*window_width;
+    render_p->skin.h = p->skin.h*window_height;
     return render_p;
 }
 

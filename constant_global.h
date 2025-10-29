@@ -2,6 +2,7 @@
 #define CONSTANT_GLOBAL_H
 
 #define SPEED 0.5
+#define COEF_SNEAK 3.f
 #define FPS 60
 #define FRAME_DELAY 1000/60
 #define WINDOW_WIDTH_START 1280
