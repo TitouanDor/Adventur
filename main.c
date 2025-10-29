@@ -28,16 +28,28 @@ Canva* Get_Canva_from_Cache(int id_canva, Gamectx *gameState){
 SDL_AppResult SDL_AppInit(void **gamestate, int argc, char *argv[])
 {
     if (!SDL_Init(SDL_INIT_VIDEO)) {
-        SDL_Log("Couldn't initialize SDL: %s", SDL_GetError());
+        WriteLog("Initialisation SDL_VIDEO : ERROR");
         return SDL_APP_FAILURE;
     }
 
+    WriteLog("Initialisation SDL_VIDEO : OK");
+
     Gamectx *gameState = (Gamectx*)SDL_calloc(1, sizeof(Gamectx));
     if (!gameState) {
+        WriteLog("Initialisation gameState : ERROR");
         return SDL_APP_FAILURE;
     }
+
+    p = InitPlayer();
+    if(!p){
+        WriteLog("Initialisation player : ERROR");
+        return SDL_APP_FAILURE;
+    }
+    WriteLog("Initialisation player : OK");
+
     gameState->cache = (Cache*)SDL_calloc(1, sizeof(Cache));
     if (!gameState->cache) {
+        WriteLog("Initialisation gameState->cache : ERROR");
         return SDL_APP_FAILURE;
     }
     *gamestate = gameState;
@@ -45,17 +57,17 @@ SDL_AppResult SDL_AppInit(void **gamestate, int argc, char *argv[])
     gameState->nb_canva = 1;
     gameState->cache->canva = Get_Canva(0);
     if(gameState->cache->canva == NULL){
+        WriteLog("Initialisation gameState->cache->canva : ERROR");
         return SDL_APP_FAILURE;
     }
     gameState->cache->next = NULL;
-
+    WriteLog("Initialisation gameState : OK");
 
     if (!SDL_CreateWindowAndRenderer("Adventur", window_width, window_height, SDL_WINDOW_RESIZABLE, &gameState->window, &gameState->renderer)) {
-        SDL_Log("Couldn't create window/renderer: %s", SDL_GetError());
+        WriteLog("Couldn't create window/renderer");
         return SDL_APP_FAILURE;
     }
-
-    p = InitPlayer();
+    WriteLog("Initialisation Window et Render : OK");
     return SDL_APP_CONTINUE;  /* carry on with the program! */
 }
 
@@ -69,9 +81,10 @@ SDL_AppResult SDL_AppEvent(void *gamestate, SDL_Event *event)
 
     if(event->type == SDL_EVENT_KEY_DOWN){
         if(event->key.key == SDLK_R){ /*Reload the cache*/
-            printf("reload\n");
+            WriteLog("Reload cache");
             gameState->cache->canva = Get_Canva(gameState->id_canva);
             if(gameState->cache->canva == NULL){
+                WriteLog("Initialisation gameState->cache->canva : ERROR");
                 return SDL_APP_FAILURE;
             }
             gameState->cache->next = NULL;
@@ -107,11 +120,13 @@ SDL_AppResult SDL_AppIterate(void *gamestate)
     else{ /*Else load it and insert it into the cache*/
         Canva* temp_canva = Get_Canva(gameState->id_canva);
         if(gameState->cache->canva == NULL){
+            WriteLog("ERROR : reload cache");
             return SDL_APP_FAILURE;
         }
         Cache* temp = (Cache*)SDL_calloc(1, sizeof(Cache));
         Cache *l_cache = gameState->cache;
         if (!temp) {
+            WriteLog("Initialisation temp : ERROR");
             return SDL_APP_FAILURE;
         }
         temp->next = NULL;
@@ -155,5 +170,5 @@ void SDL_AppQuit(void *gamestate, SDL_AppResult result)
         SDL_free(as);
     }
     /* SDL will clean up the window/renderer for us. */
-    printf("Fin du programme\n");
+    WriteLog("Fin du programme\n\n\n");
 }
