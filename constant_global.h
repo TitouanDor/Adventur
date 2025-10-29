@@ -5,4 +5,13 @@
 #define FPS 60
 #define FRAME_DELAY 1000/60
 
+typedef struct{
+    SDL_Window *window;
+    SDL_Renderer *renderer;
+    int id_canva;
+    int nb_canva;
+    Cache* cache;
+}Gamectx;
+
+
 #endif

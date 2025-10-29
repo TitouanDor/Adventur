@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include "constant_global.h"
+#include "canva.h"
 
 extern int window_width, window_height;
 
@@ -45,6 +46,50 @@ Player* Get_renderSkin(Player *P){
     render_p->skin.w = P->skin.w*window_width;
     render_p->skin.h = P->skin.h*window_height;
     return render_p;
+}
+
+Player* Change_Canva(Player *p, Canva* canva, Gamectx **ctx){
+    Gamectx *gameState = *ctx;
+    if(p->skin.x <= 0){
+        if(canva->id_next_canva[0] != -1){
+            p->skin.x = 0.97;
+            gameState->id_canva = canva->id_next_canva[0];
+        }
+        else{
+            p->skin.x = 0;
+        }
+    }
+    else if (p->skin.x+p->skin.w >= 1){
+        if(canva->id_next_canva[1] != -1){
+            p->skin.x = 0.01;
+            gameState->id_canva = canva->id_next_canva[1];
+        }
+        else{
+            p->skin.x = 1 - p->skin.w;
+        }
+    }
+    else if (p->skin.y <= 0){
+        if(canva->id_next_canva[2] != -1){
+            p->skin.y = 0.97;
+            gameState->id_canva = canva->id_next_canva[2];
+        }
+        else{
+            p->skin.y = 0;
+        }
+        
+
+    }
+    else if (p->skin.y+p->skin.h >=1){
+        if(canva->id_next_canva[3] != -1){
+            p->skin.y = 0.1;
+            gameState->id_canva = canva->id_next_canva[3];
+        }
+        else{
+            p->skin.y = 1 - p->skin.h;
+        }
+    }
+
+    return p;
 }
 
 void print_player(Player *p){

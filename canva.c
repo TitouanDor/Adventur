@@ -24,6 +24,11 @@ Canva* Get_Canva(int id_canva){
     
     Canva *canva = (Canva*)malloc(sizeof(Canva));
     SDL_FRect *L_walls;
+    canva->id_next_canva = (int*)malloc(4*sizeof(int));
+    if (canva->id_next_canva == NULL) {
+        return NULL;
+    }
+
     struct json_object *root = json_tokener_parse(buffer);
     free(buffer);
 
@@ -32,7 +37,7 @@ Canva* Get_Canva(int id_canva){
         for (int i = 0; i < n; i++) {
 
             struct json_object *obj = json_object_array_get_idx(root, i);
-            struct json_object *id, *walls;
+            struct json_object *id, *walls, *next_canva;
 
             /*Search for id*/
             if (json_object_object_get_ex(obj, "id", &id)){
@@ -81,9 +86,29 @@ Canva* Get_Canva(int id_canva){
                 else{
                     return NULL;
                 }
+
+                if(json_object_object_get_ex(obj, "id_next_canva", &next_canva) && json_object_is_type(next_canva, json_type_array)){
+
+                    int len_id = json_object_array_length(next_canva);
+                    if(len_id != 4){
+                        return NULL;
+                    }
+
+                    for(int k=0;k<len_id;k++){
+                        struct json_object *C = json_object_array_get_idx(next_canva, k);
+                        if(C == NULL || !json_object_is_type(C, json_type_int)){
+                            return NULL;
+                        }
+                        canva->id_next_canva[k] = json_object_get_int(C);
+                    }
+                }
+                else{
+                    return NULL;
+                }
                 
                 canva->Walls = L_walls;
-                printf("Canva n°%d import\n", canva->id);
+                printf("Canva n°%d import :\n", canva->id);
+                print_Canva(canva);
                 return canva;
             }
         }
@@ -96,8 +121,10 @@ Canva* Get_Canva(int id_canva){
 
 Canva* Get_render_Canva(Canva *canva){
     Canva *render_canva = (Canva*)malloc(sizeof(Canva));
+    render_canva->id_next_canva = (int*)malloc(4*sizeof(int));
     render_canva->id = canva->id;
     render_canva->nb_wall = canva->nb_wall;
+    render_canva->id_next_canva = canva->id_next_canva;
     render_canva->Walls = (SDL_FRect*)malloc(canva->nb_wall*sizeof(SDL_FRect));
     for(int i = 0; i < canva->nb_wall; i++){
         render_canva->Walls[i].x = canva->Walls[i].x*window_width;
@@ -107,4 +134,14 @@ Canva* Get_render_Canva(Canva *canva){
     }
 
     return render_canva;
+}
+
+void print_Canva(Canva *canva){
+    printf("|   id : %d\n", canva->id);
+    printf("|   nb_wall : %d\n", canva->nb_wall);
+    printf("|   id_next_canva :\n");
+    for(int i = 0; i < 4; i++) {
+        printf("|   |   [%d] : %d\n", i, canva->id_next_canva[i]);
+    }
+    printf("------------------\n");
 }

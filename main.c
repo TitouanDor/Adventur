@@ -12,13 +12,16 @@ int window_width = 1280, window_height = 720;
 int temp_window_width, temp_window_height;
 float window_ratio;
 
-typedef struct{
-    SDL_Window *window;
-    SDL_Renderer *renderer;
-    int id_canva;
-    int nb_canva;
-    Cache* cache;
-}Gamectx;
+Canva* Get_Canva_from_Cache(int id_canva, Gamectx *gameState){
+    Cache *temp = gameState->cache;
+    while(temp->next!= NULL && temp->canva->id != id_canva){
+        temp=temp->next;
+    }
+    if(temp->canva->id == id_canva){
+        return temp->canva;
+    }
+    return NULL;
+}
 
 /* This function runs once at startup. */
 SDL_AppResult SDL_AppInit(void **gamestate, int argc, char *argv[])
@@ -72,38 +75,31 @@ SDL_AppResult SDL_AppIterate(void *gamestate)
 
     const bool *state = SDL_GetKeyboardState(NULL);
     p = MovePlayer(p, state);
+    p = Change_Canva(p, Get_Canva_from_Cache(gameState->id_canva, gameState), &gameState);
 
     SDL_SetRenderDrawColor(gameState->renderer, 155, 155, 155, SDL_ALPHA_OPAQUE); /*Grey, full alpha*/
-    /* clear the window to the draw color. */
-    SDL_RenderClear(gameState->renderer);
+    SDL_RenderClear(gameState->renderer); /* clear the window to the draw color. */
 
     /*Render canva*/
     /*Search if canva is already load*/
-    Canva *temp_canva, *canva;
-    int loaded = 0, i = 0;
-    Cache *temp = gameState->cache;
-    while(loaded == 0 && temp->next==NULL){
-        if(temp->canva->id == gameState->id_canva){
-            loaded = 1;
-        }
-        else{
-            temp = temp->next;
-        }
-    }
-
-    if(loaded==1 && temp != NULL){/*If already loaded*/
-        canva = Get_render_Canva(temp->canva);
+    Canva *canva = Get_Canva_from_Cache(gameState->id_canva, gameState);
+    if(canva != NULL){/*If already loaded*/
+        canva = Get_render_Canva(canva);
     }
     else{ /*Else load it and insert it into the cache*/
-        temp_canva = Get_Canva(gameState->id_canva);
-        temp = (Cache*)SDL_calloc(1, sizeof(Cache));
+        Canva* temp_canva = Get_Canva(gameState->id_canva);
+        Cache* temp = (Cache*)SDL_calloc(1, sizeof(Cache));
+        Cache *l_cache = gameState->cache;
         if (!temp) {
             return SDL_APP_FAILURE;
         }
         temp->next = NULL;
         temp->canva = temp_canva;
         gameState->nb_canva++;
-        gameState->cache->next = temp;
+        while(l_cache->next!=NULL){
+            l_cache=l_cache->next;
+        }
+        l_cache->next = temp;
         canva = Get_render_Canva(temp->canva);
     }
 
