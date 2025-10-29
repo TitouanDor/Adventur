@@ -4,6 +4,8 @@
 #define SPEED 0.5
 #define FPS 60
 #define FRAME_DELAY 1000/60
+#define WINDOW_WIDTH_START 1280
+#define WINDOW_HEIGHT_START 720
 
 typedef struct{
     SDL_Window *window;

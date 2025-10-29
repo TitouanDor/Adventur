@@ -8,7 +8,7 @@
 #include "canva.h"
 
 static Player *p = NULL;
-int window_width = 1280, window_height = 720;
+int window_width = WINDOW_WIDTH_START, window_height = WINDOW_HEIGHT_START;
 int temp_window_width, temp_window_height;
 float window_ratio;
 
