@@ -9,6 +9,9 @@ extern int window_width, window_height;
 
 Player* InitPlayer(void){
     Player *new_p = (Player*)malloc(sizeof(Player));
+    if(!new_p){
+        return NULL;
+    }
     new_p->skin.h = 20.f/(float)window_height;
     new_p->skin.w = 20.f/(float)window_width;
     new_p->skin.x = 0.5;

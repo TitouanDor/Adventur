@@ -10,6 +10,7 @@ add_executable(
     main.c
     Player.c
     canva.c
+    Log.c
     )
 
 target_link_libraries(Adventur PRIVATE SDL3::SDL3)

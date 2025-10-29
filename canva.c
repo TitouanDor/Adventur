@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <json-c/json.h>
 #include "canva.h"
+#include "Log.h"
 
 extern int window_width, window_height;
 
@@ -107,8 +108,10 @@ Canva* Get_Canva(int id_canva){
                 }
                 
                 canva->Walls = L_walls;
-                printf("Canva n°%d import :\n", canva->id);
-                print_Canva(canva);
+                char texte[100];
+                sprintf(texte, "Canva n°%d import :", canva->id);
+                WriteLog(texte);
+                Import_canva(canva);
                 return canva;
             }
         }
