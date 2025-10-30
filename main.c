@@ -27,6 +27,8 @@ Canva* Get_Canva_from_Cache(int id_canva, Gamectx *gameState){
 
 /* This function runs once at startup. */
 SDL_AppResult SDL_AppInit(void **gamestate, int argc, char *argv[]){
+    InitLog();
+    WriteLog("Initialisation Log : OK");
     if (!SDL_Init(SDL_INIT_VIDEO)) {
         WriteLog("Initialisation SDL_VIDEO : ERROR");
         return SDL_APP_FAILURE;
@@ -151,12 +153,26 @@ SDL_AppResult SDL_AppIterate(void *gamestate){
     SDL_SetRenderDrawColor(gameState->renderer, 100, 100, 100, SDL_ALPHA_OPAQUE);  /* Dark Grey, full alpha */
     SDL_RenderRects(gameState->renderer, canva->Walls, canva->nb_wall);
     SDL_RenderFillRects(gameState->renderer,canva->Walls, canva->nb_wall);
+    Gate *l = canva->gates;
+    for(int i = 0;i<canva->nb_gate;i++){
+        SDL_SetRenderDrawColor(gameState->renderer, canva->gates[i].color.r, canva->gates[i].color.g, canva->gates[i].color.b, canva->gates[i].color.a);
+        SDL_RenderRect(gameState->renderer, &canva->gates[i].skin);
+        SDL_RenderFillRect(gameState->renderer, &canva->gates[i].skin);
+        if(debug == 1){
+            char debug_text [200];
+            sprintf(debug_text, "Debug gate|Gate_id : %d|Gate State : %d", canva->gates[i].id_gate, canva->gates[i].state);
+            SDL_SetRenderDrawColor(gameState->renderer, 255, 255, 255, SDL_ALPHA_OPAQUE);
+            SDL_RenderDebugText(gameState->renderer,150,100+i*10,debug_text);
+        }   
+    }
+    free(canva);
 
     /*Render player*/
     Player *render_player = Get_renderSkin(p);
     SDL_SetRenderDrawColor(gameState->renderer, 255, 0, 0, SDL_ALPHA_OPAQUE);  /* red, full alpha */
     SDL_RenderRect(gameState->renderer, &render_player->skin);
     SDL_RenderFillRect(gameState->renderer, &render_player->skin);
+    free(render_player);
 
 
     if(debug == 1){
