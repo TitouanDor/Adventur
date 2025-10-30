@@ -18,6 +18,7 @@ Player* InitPlayer(void){
     new_p->skin.x = 0.5;
     new_p->skin.y = 0.5;
     new_p->state = STOP;
+    new_p->Key = NULL;
     return new_p;
 }
 
@@ -148,6 +149,40 @@ Player* Collision(Player *p, Canva* canva){
     }
     return p;
 }
+
+Player* Get_Key(Player *p, Canva** pcanva){
+    Canva *canva = *pcanva;
+    Key *keys = canva->keys;
+    SDL_FRect inter;
+    for(int i = 0; i<canva->nb_key;i++){
+        Key key = keys[i];
+        if(SDL_GetRectIntersectionFloat(&p->skin, &(key.skin), &inter)){
+            (*pcanva)->keys[i].state=TAKEN;
+            key_inv *newkey = (key_inv*)malloc(sizeof(key_inv));
+            if(!newkey){
+                WriteLog("ERROR Get_key");
+                return p;
+            }
+            newkey->id = (*pcanva)->keys[i].id_key;
+            newkey->next = NULL;
+
+            if(p->Key == NULL){
+                p->Key = newkey;
+            }
+            else{
+                key_inv *temp = p->Key;
+                while(temp->next != NULL){
+                    temp=temp->next;
+                }
+                temp->next=newkey;
+            }
+            WriteLog("Clef prise");
+        }
+    }
+    return p;
+}
+
+
 
 void print_player(Player *p){
     printf("Player : x : %f, y : %f, w : %f, h : %f\n", 

@@ -42,12 +42,7 @@ SDL_AppResult SDL_AppInit(void **gamestate, int argc, char *argv[]){
         return SDL_APP_FAILURE;
     }
 
-    p = InitPlayer();
-    if(!p){
-        WriteLog("Initialisation player : ERROR");
-        return SDL_APP_FAILURE;
-    }
-    WriteLog("Initialisation player : OK");
+    
 
     gameState->cache = (Cache*)SDL_calloc(1, sizeof(Cache));
     if (!gameState->cache) {
@@ -63,6 +58,12 @@ SDL_AppResult SDL_AppInit(void **gamestate, int argc, char *argv[]){
         return SDL_APP_FAILURE;
     }
     gameState->cache->next = NULL;
+    p = InitPlayer();
+    if(!p){
+        WriteLog("Initialisation player : ERROR");
+        return SDL_APP_FAILURE;
+    }
+    WriteLog("Initialisation player : OK");
     WriteLog("Initialisation gameState : OK");
 
     if (!SDL_CreateWindowAndRenderer("Adventur", window_width, window_height, SDL_WINDOW_RESIZABLE, &gameState->window, &gameState->renderer)) {
@@ -119,6 +120,7 @@ SDL_AppResult SDL_AppIterate(void *gamestate){
     p = MovePlayer(p, state);
     p = Change_Canva(p, canva, &gameState);
     p = Collision(p, canva);
+    p = Get_Key(p, &canva);
     SDL_SetRenderDrawColor(gameState->renderer, 155, 155, 155, SDL_ALPHA_OPAQUE); /*Grey, full alpha*/
     SDL_RenderClear(gameState->renderer); /* clear the window to the draw color. */
 
@@ -192,7 +194,18 @@ SDL_AppResult SDL_AppIterate(void *gamestate){
         SDL_SetRenderDrawColor(gameState->renderer, 255, 255, 255, SDL_ALPHA_OPAQUE);
         SDL_RenderDebugText(gameState->renderer,0,0,debug_text);
     }
-    
+
+    key_inv *keys = p->Key;
+
+    int i = 0;
+    while(keys != NULL){
+        char debug_text [200];
+        sprintf(debug_text, "Debug inv|key_id : %d", keys->id);
+        SDL_SetRenderDrawColor(gameState->renderer, 255, 255, 255, SDL_ALPHA_OPAQUE);
+        SDL_RenderDebugText(gameState->renderer,window_width-200,100+i*10,debug_text);
+        keys = keys->next;
+        i++;
+    }
 
     /* put the newly-cleared rendering on the screen. */
     SDL_RenderPresent(gameState->renderer);
