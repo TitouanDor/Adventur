@@ -7,6 +7,12 @@
 
 extern int window_width, window_height;
 
+/*Canvas are store as a list of object in this form in the canva.json
+
+{"id" : int, "Walls" : [[x,y,w,h]], "id_next_canva" : [-1,-1,-1,-1]}
+
+*/
+
 Canva* Get_Canva(int id_canva){
     /*take the json file*/
     FILE *f = fopen("./../canva.json", "r");

@@ -5,9 +5,9 @@
 #include "constant_global.h"
 
 enum player_state{
-    SNEAK,
-    RUNNING,
     STOP,
+    RUNNING,
+    SNEAK,
 };
 
 typedef struct{
