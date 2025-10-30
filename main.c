@@ -165,6 +165,17 @@ SDL_AppResult SDL_AppIterate(void *gamestate){
             SDL_RenderDebugText(gameState->renderer,150,100+i*10,debug_text);
         }   
     }
+    for(int i = 0;i<canva->nb_key;i++){
+        SDL_SetRenderDrawColor(gameState->renderer, canva->keys[i].color.r, canva->keys[i].color.g, canva->keys[i].color.b, canva->keys[i].color.a);
+        SDL_RenderRect(gameState->renderer, &canva->keys[i].skin);
+        SDL_RenderFillRect(gameState->renderer, &canva->keys[i].skin);
+        if(debug == 1){
+            char debug_text [200];
+            sprintf(debug_text, "Debug key|key_id : %d|key State : %d", canva->keys[i].id_key, canva->keys[i].state);
+            SDL_SetRenderDrawColor(gameState->renderer, 255, 255, 255, SDL_ALPHA_OPAQUE);
+            SDL_RenderDebugText(gameState->renderer,250,100+i*10,debug_text);
+        } 
+    }
     free(canva);
 
     /*Render player*/

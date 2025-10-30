@@ -39,6 +39,7 @@ int Import_canva(Canva* canva){
     fprintf(fichier, "|   id : %d\n", canva->id);
     fprintf(fichier,"|   nb_wall : %d\n", canva->nb_wall);
     fprintf(fichier,"|   nb_gate : %d\n", canva->nb_gate);
+    fprintf(fichier,"|   nb_key : %d\n", canva->nb_key);
     fprintf(fichier,"|   id_next_canva :\n");
     for(int i = 0; i < 4; i++) {
         fprintf(fichier,"|   |   [%d] : %d\n", i, canva->id_next_canva[i]);

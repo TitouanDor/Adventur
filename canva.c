@@ -9,7 +9,7 @@ extern int window_width, window_height;
 
 /*Canvas are store as a list of object in this form in the canva.json
 
-{"id" : int, "Walls" : [[x,y,w,h]], "id_next_canva" : [-1,-1,-1,-1]}
+{"id" : int, "Walls" : [[x,y,w,h]], "id_next_canva" : [-1,-1,-1,-1], "gate" : [], "key" : []}
 
 */
 
@@ -32,6 +32,7 @@ Canva* Get_Canva(int id_canva){
     Canva *canva = (Canva*)malloc(sizeof(Canva));
     SDL_FRect *L_walls;
     Gate *L_gate;
+    Key *L_Key;
     canva->id_next_canva = (int*)malloc(4*sizeof(int));
     if (canva->id_next_canva == NULL) {
         return NULL;
@@ -45,7 +46,7 @@ Canva* Get_Canva(int id_canva){
         for (int i = 0; i < n; i++) {
 
             struct json_object *obj = json_object_array_get_idx(root, i);
-            struct json_object *id, *walls, *next_canva, *gates, *gate, *id_gate, *skin_gate, *color_gate;
+            struct json_object *id, *walls, *next_canva, *gates, *gate, *id_gate, *skin_gate, *color_gate, *keys, *key, *id_key, *skin_key, *color_key;
 
             /*Search for id*/
             if (json_object_object_get_ex(obj, "id", &id)){
@@ -182,9 +183,79 @@ Canva* Get_Canva(int id_canva){
                 else{
                     return NULL;
                 }
+
+                if(json_object_object_get_ex(obj, "key", &keys)){
+                    int len_keys = json_object_array_length(keys);
+                    canva->nb_key = len_keys;
+                    L_Key = (Key*)malloc(len_keys*sizeof(Key));
+                    for(int j = 0;j<len_keys;j++){
+                        L_Key[j].state=ON_GROUND;
+                        key = json_object_array_get_idx(keys, j);
+                        if (json_object_object_get_ex(key, "id", &id_key)){
+                            L_Key[j].id_key= json_object_get_int(id_key);
+                        }
+                        else{
+                            return NULL;
+                        }
+
+                        int temp_color[4];
+                        float temp_skin[4];
+                        if(json_object_object_get_ex(key, "skin", &skin_key) && json_object_is_type(skin_key, json_type_array)){
+
+                            int len_skin = json_object_array_length(skin_key);
+                            if(len_skin != 4){
+                                return NULL;
+                            }
+
+                            for(int k=0;k<len_skin;k++){
+                                struct json_object *C = json_object_array_get_idx(skin_key, k);
+                                if(C == NULL || !json_object_is_type(C, json_type_int)){
+                                    return NULL;
+                                }
+                                temp_skin[k] = (float)json_object_get_int(C);
+                                temp_skin[k] /= 100.f;
+                            }
+                        }
+                        else{
+                            return NULL;
+                        }
+
+                        if(json_object_object_get_ex(key, "color", &color_key) && json_object_is_type(color_key, json_type_array)){
+
+                            int len_color = json_object_array_length(color_key);
+                            if(len_color != 4){
+                                return NULL;
+                            }
+
+                            for(int k=0;k<len_color;k++){
+                                struct json_object *C = json_object_array_get_idx(color_key, k);
+                                if(C == NULL || !json_object_is_type(C, json_type_int)){
+                                    return NULL;
+                                }
+                                temp_color[k] = json_object_get_int(C);
+                            }
+                        }
+                        else{
+                            return NULL;
+                        }
+
+                        L_Key[j].skin.x = temp_skin[0];
+                        L_Key[j].skin.y = temp_skin[1];
+                        L_Key[j].skin.w = temp_skin[2];
+                        L_Key[j].skin.h = temp_skin[3];
+                        L_Key[j].color.r = temp_color[0];
+                        L_Key[j].color.g = temp_color[1];
+                        L_Key[j].color.b = temp_color[2];
+                        L_Key[j].color.a = temp_color[3];
+                    }
+                }
+                else{
+                    return NULL;
+                }
                 
                 canva->Walls = L_walls;
                 canva->gates = L_gate;
+                canva->keys = L_Key;
                 char texte[100];
                 sprintf(texte, "Canva n°%d import :", canva->id);
                 WriteLog(texte);
@@ -201,13 +272,14 @@ Canva* Get_Canva(int id_canva){
 
 Canva* Get_render_Canva(Canva *canva){
     Canva *render_canva = (Canva*)malloc(sizeof(Canva));
-    int cpt_gate = 0;
+    int cpt_gate = 0, cpt_key = 0;
     render_canva->id_next_canva = (int*)malloc(4*sizeof(int));
     render_canva->id = canva->id;
     render_canva->nb_wall = canva->nb_wall;
     render_canva->id_next_canva = canva->id_next_canva;
     render_canva->Walls = (SDL_FRect*)malloc(canva->nb_wall*sizeof(SDL_FRect));
     render_canva->gates = (Gate*)malloc(canva->nb_gate*sizeof(Gate));
+    render_canva->keys = (Key*)malloc(canva->nb_key*sizeof(Key));
     for(int i = 0; i < canva->nb_wall; i++){
         render_canva->Walls[i].x = canva->Walls[i].x*window_width;
         render_canva->Walls[i].y = canva->Walls[i].y*window_height;
@@ -230,7 +302,24 @@ Canva* Get_render_Canva(Canva *canva){
         }
         
     }
+    for(int i = 0; i<canva->nb_key;i++){
+        if(canva->keys[i].state == ON_GROUND){
+            render_canva->keys[i].id_key = canva->keys[i].id_key;
+            render_canva->keys[i].state = canva->keys[i].state;
+            render_canva->keys[i].skin.x = canva->keys[i].skin.x*window_width;
+            render_canva->keys[i].skin.y = canva->keys[i].skin.y*window_height;
+            render_canva->keys[i].skin.w = canva->keys[i].skin.w*window_width;
+            render_canva->keys[i].skin.h = canva->keys[i].skin.h*window_height;
+            render_canva->keys[i].color.r = canva->keys[i].color.r;
+            render_canva->keys[i].color.g = canva->keys[i].color.g;
+            render_canva->keys[i].color.b = canva->keys[i].color.b;
+            render_canva->keys[i].color.a = canva->keys[i].color.a;
+            cpt_key++;
+        }
+        
+    }
     render_canva->nb_gate = cpt_gate;
+    render_canva->nb_key = cpt_key;
 
     return render_canva;
 }
