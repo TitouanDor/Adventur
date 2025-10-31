@@ -150,31 +150,30 @@ Player* Collision(Player *p, Canva* canva){
     return p;
 }
 
-Player* Get_Key(Player *p, Canva** pcanva){
+Player* Get_Key(Player *p, Canva** pcanva) {
     Canva *canva = *pcanva;
     Key *keys = canva->keys;
     SDL_FRect inter;
-    for(int i = 0; i<canva->nb_key;i++){
-        Key key = keys[i];
-        if(SDL_GetRectIntersectionFloat(&p->skin, &(key.skin), &inter)){
-            (*pcanva)->keys[i].state=TAKEN;
-            key_inv *newkey = (key_inv*)malloc(sizeof(key_inv));
-            if(!newkey){
+    for(int i = 0; i < canva->nb_key; i++) {
+        if(keys[i].state == TAKEN) continue; // Safeguard against double-pickup
+        if(SDL_GetRectIntersectionFloat(&p->skin, &(keys[i].skin), &inter)) {
+            keys[i].state = TAKEN;
+            key_inv *newkey = malloc(sizeof(key_inv));
+            if(!newkey) {
                 WriteLog("ERROR Get_key");
                 return p;
             }
-            newkey->id = (*pcanva)->keys[i].id_key;
+            newkey->id = keys[i].id_key;
             newkey->next = NULL;
-
-            if(p->Key == NULL){
+            if(p->Key == NULL) {
                 p->Key = newkey;
             }
-            else{
+            else {
                 key_inv *temp = p->Key;
-                while(temp->next != NULL){
-                    temp=temp->next;
+                while(temp->next != NULL) {
+                    temp = temp->next;
                 }
-                temp->next=newkey;
+                temp->next = newkey;
             }
             WriteLog("Clef prise");
         }
