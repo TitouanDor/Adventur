@@ -182,6 +182,48 @@ Player* Get_Key(Player *p, Canva** pcanva){
     return p;
 }
 
+Player* Open_Gate(Player *p, Canva** pcanva){
+    Canva *canva = *pcanva;
+    int unlock = 0;
+    Gate *gates = canva->gates;
+    SDL_FRect inter;
+    for(int i = 0;i<canva->nb_gate;i++){
+        Gate gate = gates[i];
+        key_inv *keys = p->Key;
+        if(SDL_GetRectIntersectionFloat(&p->skin, &(gate.skin), &inter) && gate.state != OPEN){
+            while(keys != NULL){
+                if(keys->id==gate.id_gate && gate.state != OPEN){
+                    (*pcanva)->gates[i].state=OPEN;
+                    unlock = 1;
+                    WriteLog("ouverture");
+                    break;
+                }
+                keys = keys->next;
+            }
+            if(unlock == 0 ){
+                if(inter.w < inter.h){
+                    if(p->skin.x < gate.skin.x){
+                        p->skin.x -= inter.w;
+                    }
+                    else{
+                        p->skin.x += inter.w;
+                    }
+                }
+                else{
+                    if(p->skin.y < gate.skin.y){
+                        p->skin.y -= inter.h;
+                    }
+                    else{
+                        p->skin.y += inter.h;
+                    }
+                }
+            }
+        }
+    }
+    
+    return p;
+}
+
 
 
 void print_player(Player *p){

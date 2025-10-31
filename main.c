@@ -103,6 +103,10 @@ SDL_AppResult SDL_AppEvent(void *gamestate, SDL_Event *event){
             gameState->cache->next = NULL;
             gameState->nb_canva = 1;
         }
+
+        if(event->key.key == SDLK_C){
+            Import_canva(Get_Canva_from_Cache(gameState->id_canva, gameState));
+        }
     }
 
     return SDL_APP_CONTINUE;  /* carry on with the program! */
@@ -121,6 +125,7 @@ SDL_AppResult SDL_AppIterate(void *gamestate){
     p = Change_Canva(p, canva, &gameState);
     p = Collision(p, canva);
     p = Get_Key(p, &canva);
+    p = Open_Gate(p, &canva);
     SDL_SetRenderDrawColor(gameState->renderer, 155, 155, 155, SDL_ALPHA_OPAQUE); /*Grey, full alpha*/
     SDL_RenderClear(gameState->renderer); /* clear the window to the draw color. */
 

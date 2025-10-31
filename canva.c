@@ -4,6 +4,7 @@
 #include <json-c/json.h>
 #include "canva.h"
 #include "Log.h"
+#include <time.h>
 
 extern int window_width, window_height;
 
@@ -276,48 +277,57 @@ Canva* Get_render_Canva(Canva *canva){
     render_canva->id_next_canva = (int*)malloc(4*sizeof(int));
     render_canva->id = canva->id;
     render_canva->nb_wall = canva->nb_wall;
-    render_canva->id_next_canva = canva->id_next_canva;
+    for(int i = 0; i < 4; i++){
+        render_canva->id_next_canva[i] = canva->id_next_canva[i];
+    }
+
     render_canva->Walls = (SDL_FRect*)malloc(canva->nb_wall*sizeof(SDL_FRect));
-    render_canva->gates = (Gate*)malloc(canva->nb_gate*sizeof(Gate));
-    render_canva->keys = (Key*)malloc(canva->nb_key*sizeof(Key));
+    
     for(int i = 0; i < canva->nb_wall; i++){
         render_canva->Walls[i].x = canva->Walls[i].x*window_width;
         render_canva->Walls[i].y = canva->Walls[i].y*window_height;
         render_canva->Walls[i].w = canva->Walls[i].w*window_width;
         render_canva->Walls[i].h = canva->Walls[i].h*window_height;
     }
-    for(int i = 0; i<canva->nb_gate;i++){
+
+    cpt_gate = 0;
+    for(int i = 0; i < canva->nb_gate; i++){
         if(canva->gates[i].state == CLOSE){
-            render_canva->gates[i].id_gate = canva->gates[i].id_gate;
-            render_canva->gates[i].state = canva->gates[i].state;
-            render_canva->gates[i].skin.x = canva->gates[i].skin.x*window_width;
-            render_canva->gates[i].skin.y = canva->gates[i].skin.y*window_height;
-            render_canva->gates[i].skin.w = canva->gates[i].skin.w*window_width;
-            render_canva->gates[i].skin.h = canva->gates[i].skin.h*window_height;
-            render_canva->gates[i].color.r = canva->gates[i].color.r;
-            render_canva->gates[i].color.g = canva->gates[i].color.g;
-            render_canva->gates[i].color.b = canva->gates[i].color.b;
-            render_canva->gates[i].color.a = canva->gates[i].color.a;
             cpt_gate++;
         }
-        
     }
-    for(int i = 0; i<canva->nb_key;i++){
+    render_canva->gates = (Gate*)malloc(cpt_gate*sizeof(Gate));
+    int index = 0;
+    for(int i = 0; i < canva->nb_gate; i++){
+        if(canva->gates[i].state == CLOSE){
+            render_canva->gates[index] = canva->gates[i];
+            render_canva->gates[index].skin.x *= window_width;
+            render_canva->gates[index].skin.y *= window_height;
+            render_canva->gates[index].skin.w *= window_width;
+            render_canva->gates[index].skin.h *= window_height;
+            index++;
+        }
+    }
+
+    cpt_key = 0;
+    for(int i = 0; i < canva->nb_key; i++){
         if(canva->keys[i].state == ON_GROUND){
-            render_canva->keys[i].id_key = canva->keys[i].id_key;
-            render_canva->keys[i].state = canva->keys[i].state;
-            render_canva->keys[i].skin.x = canva->keys[i].skin.x*window_width;
-            render_canva->keys[i].skin.y = canva->keys[i].skin.y*window_height;
-            render_canva->keys[i].skin.w = canva->keys[i].skin.w*window_width;
-            render_canva->keys[i].skin.h = canva->keys[i].skin.h*window_height;
-            render_canva->keys[i].color.r = canva->keys[i].color.r;
-            render_canva->keys[i].color.g = canva->keys[i].color.g;
-            render_canva->keys[i].color.b = canva->keys[i].color.b;
-            render_canva->keys[i].color.a = canva->keys[i].color.a;
             cpt_key++;
         }
-        
     }
+    render_canva->keys = (Key*)malloc(cpt_key*sizeof(Key));
+    index = 0;
+    for(int i = 0; i < canva->nb_key; i++){
+        if(canva->keys[i].state == ON_GROUND){
+            render_canva->keys[index] = canva->keys[i];
+            render_canva->keys[index].skin.x *= window_width;
+            render_canva->keys[index].skin.y *= window_height;
+            render_canva->keys[index].skin.w *= window_width;
+            render_canva->keys[index].skin.h *= window_height;
+            index++;
+        }
+    }
+
     render_canva->nb_gate = cpt_gate;
     render_canva->nb_key = cpt_key;
 

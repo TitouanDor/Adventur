@@ -44,6 +44,25 @@ int Import_canva(Canva* canva){
     for(int i = 0; i < 4; i++) {
         fprintf(fichier,"|   |   [%d] : %d\n", i, canva->id_next_canva[i]);
     }
+    fprintf(fichier,"|   Gates :\n");
+    for(int i=0;i<canva->nb_gate;i++){
+        Gate *g = &canva->gates[i];
+        fprintf(fichier, "|   |   Gate ID : %d\n", g->id_gate);
+        fprintf(fichier, "|   |   |   Skin (x=%.2f, y=%.2f, w=%.2f, h=%.2f)\n", g->skin.x, g->skin.y, g->skin.w, g->skin.h);
+        fprintf(fichier, "|   |   |   Color (r=%d, g=%d, b=%d, a=%d)\n", g->color.r, g->color.g, g->color.b, g->color.a);
+        fprintf(fichier, "|   |   |   State : ");
+        switch(g->state){
+            case CLOSE:
+                fprintf(fichier, "CLOSE\n");
+                break;
+            case OPEN:
+                fprintf(fichier, "OPEN\n");
+                break;
+            default:
+                fprintf(fichier, "UNKNOWN\n");
+                break;
+        }
+    }
     fprintf(fichier,"------------------\n");
     fclose(fichier);
     return 0;

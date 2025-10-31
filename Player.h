@@ -28,6 +28,7 @@ Player* Get_renderSkin(Player *p);
 Player* Change_Canva(Player *p, Canva* canva, Gamectx **gameState);
 Player* Collision(Player *p, Canva* canva);
 Player* Get_Key(Player *p, Canva** pcanva);
+Player* Open_Gate(Player *p, Canva** pcanva);
 void print_player(Player *p);
 
 #endif
