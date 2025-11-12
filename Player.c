@@ -105,8 +105,6 @@ Player* Change_Canva(Player *p, Canva* canva, Gamectx **ctx){
         else{
             p->skin.y = 0;
         }
-        
-
     }
     else if (p->skin.y+p->skin.h >=1){
         if(canva->id_next_canva[3] != -1){
@@ -120,7 +118,6 @@ Player* Change_Canva(Player *p, Canva* canva, Gamectx **ctx){
             p->skin.y = 1 - p->skin.h;
         }
     }
-
     return p;
 }
 
@@ -175,7 +172,9 @@ Player* Get_Key(Player *p, Canva** pcanva) {
                 }
                 temp->next = newkey;
             }
-            WriteLog("Clef prise");
+            char texte[100];
+            sprintf(texte, "Clef n°%d prise", keys[i].id_key);
+            WriteLog(texte);
         }
     }
     return p;
